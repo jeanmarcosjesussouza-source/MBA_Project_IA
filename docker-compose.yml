@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus:/etc/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - backend
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3001:3000"
+    networks:
+      - backend
+
+  ai_service:
+    build: ./ai_service
+    volumes:
+      - ./data:/data:ro  # :ro significa apenas leitura, mais seguro
+      - ./ai_service/model:/model
+    # Esta linha abaixo força o log a aparecer mesmo se houver erro
+    stdin_open: true
+    tty: true
+    networks:
+      - backend
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: logs
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  grafana_data:
+  db_data:
+  data_volume:
