@@ -1,4 +1,4 @@
-# .gitignore para não subir "lixo" (muito importante!)
+
 echo "db_data/
 grafana_data/
 prometheus_data/
